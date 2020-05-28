@@ -9,8 +9,13 @@ module.exports = {
     mode: 'development',
     output: {
         path: path.resolve(__dirname, 'public/js'),
+        publicPath: 'js',
         filename: './[name].js'
     },
-    watch: true
+    devServer: {
+        open: true,
+        watchContentBase: true,
+        contentBase: './public'
+    }
 }
 
