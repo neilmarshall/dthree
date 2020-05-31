@@ -4,7 +4,8 @@ module.exports = {
     context: path.resolve(__dirname, 'src'),
     entry: {
         example1: './example1.js',
-        example2: './example2.js'
+        example2: './example2.js',
+        example3: './example3.js'
     },
     mode: 'development',
     output: {
