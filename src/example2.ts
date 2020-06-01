@@ -6,8 +6,8 @@ class Building {
 
 document.addEventListener('DOMContentLoaded', async () => {
 
-    const data: number[] = await d3.json('data/buildings.json')
-        .then((json: Building[]) => json.map(d => d.height));
+    const data: number[] = await d3.json<Building[]>('data/buildings.json')
+        .then(json => json.map(d => d.height));
 
     const svg = d3.select('#svg')
         .append('svg').attr('width', 400).attr('height', 400);

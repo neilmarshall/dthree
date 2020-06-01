@@ -6,36 +6,80 @@ class Building {
 
 document.addEventListener('DOMContentLoaded', async () => {
 
-    const SVG_WIDTH = 400;
-    const SVG_HEIGHT = 400;
-
+    // load data
     const buildings: Building[] = await d3.json('data/buildings.json');
 
-    const svg = d3.select('#svg')
-        .append('svg')
-            .attr('width', SVG_WIDTH)
-            .attr('height', SVG_HEIGHT);
+    // set up chart
+    const margin = { top: 10, right: 10, bottom: 100, left: 100 },
+          width = 600 - margin.left - margin.right,
+          height = 400 - margin.top - margin.bottom;
 
+    const g = d3.select('body')
+        .append('svg')
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", width + margin.top + margin.bottom)
+        .append('g')
+            .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
+
+    // create scales
     const x_scale = d3.scaleBand()
         .domain(buildings.map(b => b.name))
-        .range([0, SVG_WIDTH])
+        .range([0, width])
         .padding(0.2);
 
     const y_scale = d3.scaleLinear()
-        .domain([0, d3.max(buildings, b => b.height)])
-        .range([0, SVG_HEIGHT]);
+        .domain([0, d3.max(buildings, b => b.height) || 0])
+        .range([0, height]);
 
-    const color_scale = d3.scaleOrdinal()
+    const color_scale = d3.scaleOrdinal<string>()
         .domain(buildings.map(b => b.name))
         .range(d3.schemeCategory10);
 
-    svg.selectAll('rect')
+    // add x-axis
+    const axisBottom = d3.axisBottom(x_scale);
+    g.append('g')
+        .attr("class", "axis-bottom")
+        .attr("transform", "translate(0, " + height + ")")
+        .call(axisBottom)
+        .selectAll('text')
+            .attr('y', 10)
+            .attr('x', -5)
+            .attr('text-anchor', 'end')
+            .attr('transform', 'rotate(-40)')
+
+    // add y-axis
+    const axisLeft = d3.axisLeft(y_scale)
+        .ticks(3)
+        .tickFormat(d => d + 'm');
+    g.append('g')
+        .attr("class", "axis-left")
+        .call(axisLeft);
+
+    // add x-axis label
+    g.append("text")
+        .attr('x', width / 2)
+        .attr('y', height + 140)
+        .attr('font-size', '20px')
+        .attr('text-anchor', 'middle')
+        .text("The world's tallest buildings");
+
+    // add y-axis label
+    g.append("text")
+        .attr('x', -height / 2)
+        .attr('y', -60)
+        .attr('font-size', '20px')
+        .attr('text-anchor', 'middle')
+        .attr('transform', 'rotate(-90)')
+        .text("Height (m)");
+
+    // add data to chart
+    g.selectAll('rect')
         .data(buildings)
         .enter()
         .append('rect')
-            .attr('x', (b: Building) => x_scale(b.name))
-            .attr('y', (b: Building) => SVG_HEIGHT - y_scale(b.height))
+            .attr('x', b => x_scale(b.name) || 0)
+            .attr('y', b => height - y_scale(b.height))
             .attr('width', () => x_scale.bandwidth())
-            .attr('height', (b: Building) => y_scale(b.height))
-            .attr('fill', (b: Building) => color_scale(b.name));
+            .attr('height', b => y_scale(b.height))
+            .attr('fill', b => color_scale(b.name));
 });
