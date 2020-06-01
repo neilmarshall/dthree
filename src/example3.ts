@@ -25,10 +25,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const x_scale = d3.scaleBand()
         .domain(buildings.map(b => b.name))
         .range([0, width])
-        .padding(0.2);
+        .padding(0.25);
 
     const y_scale = d3.scaleLinear()
-        .domain([0, d3.max(buildings, b => b.height) || 0])
+        .domain([d3.max(buildings, b => b.height) || 0, 0])
         .range([0, height]);
 
     const color_scale = d3.scaleOrdinal<string>()
@@ -78,8 +78,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         .enter()
         .append('rect')
             .attr('x', b => x_scale(b.name) || 0)
-            .attr('y', b => height - y_scale(b.height))
+            .attr('y', b => y_scale(b.height))
             .attr('width', () => x_scale.bandwidth())
-            .attr('height', b => y_scale(b.height))
+            .attr('height', b => height - y_scale(b.height))
             .attr('fill', b => color_scale(b.name));
 });
