@@ -35,8 +35,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         .domain([d3.max(data, s => s.revenue) || 0, 0])
         .range([0, height]);
 
-    const color_scale = d3.scaleSequential(d3.interpolateGreens)
-        .domain([0, data.length + 1]);
+    const color_scale = d3.scaleOrdinal(d3.schemeGreens[data.length])
+        .domain(data.map(s => s.month));
 
     // add x-axis
     const axisBottom = d3.axisBottom(x_scale);
@@ -83,5 +83,5 @@ document.addEventListener('DOMContentLoaded', async () => {
             .attr('y', s => y_scale(s.revenue))
             .attr('width', () => x_scale.bandwidth())
             .attr('height', s => height - y_scale(s.revenue))
-            .attr('fill', (_, i) => color_scale(i + 1));
+            .attr('fill', s => color_scale(s.month));
 });

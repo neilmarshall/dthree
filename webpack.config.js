@@ -6,7 +6,8 @@ module.exports = {
         example1: './example1.js',
         example2: './example2.js',
         example3: './example3.js',
-        example4: './example4.js'
+        example4: './example4.js',
+        scales: './scales.js'
     },
     mode: 'development',
     output: {
