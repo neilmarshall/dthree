@@ -1,13 +1,9 @@
 import * as d3 from 'd3';
 
-class Building {
-    constructor(public name: string, public height: number) {}
-}
-
 document.addEventListener('DOMContentLoaded', async () => {
 
     // load data
-    const buildings: Building[] = await d3.json('data/buildings.json');
+    const buildings: {name: string, height: number}[] = await d3.json('data/buildings.json');
 
     // set up chart
     const margin = { top: 10, right: 10, bottom: 100, left: 100 },

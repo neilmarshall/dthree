@@ -1,17 +1,9 @@
 import * as d3 from 'd3';
 
-class Sales {
-    constructor(
-        public month: string,
-        public revenue: number,
-        public profit: number
-    ) {}
-}
-
 document.addEventListener('DOMContentLoaded', async () => {
 
     // load data
-    const data: Sales[] = await d3.json('data/revenues.json');
+    const data: {month: string, revenue: number}[] = await d3.json('data/revenues.json');
 
     // set up chart
     const margin = { top: 10, right: 10, bottom: 100, left: 100 },
