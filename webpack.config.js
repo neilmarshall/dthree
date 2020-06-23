@@ -9,6 +9,7 @@ module.exports = {
         example4: './example4.js',
         example5: './example5.js',
         example6: './example6.js',
+        gapminder: './gapminder.js',
         scales: './scales.js'
     },
     mode: 'development',
@@ -21,6 +22,14 @@ module.exports = {
         open: true,
         watchContentBase: true,
         contentBase: './public'
+    },
+    module: {
+        rules: [
+            {
+                test: /\.css$/i,
+                use: ['style-loader', 'css-loader']
+            }
+        ]
     }
 }
 
