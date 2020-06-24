@@ -45,9 +45,11 @@ g.append("text")
 
 const yearText = g.append("text")
     .classed('h4', true)
-    .attr('fill', 'grey')
-    .attr('x', width - 50)
-    .attr('y', height - 20);
+    .attr('transform', `translate(${width - 50}, ${height - 20})`)
+    .attr('fill', 'grey');
+
+const legend = g.append('g')
+    .attr('transform', `translate(${width - 10}, ${height - 125})`)
 
 const duration = 100;
 const t = d3.transition().duration(duration);
@@ -110,6 +112,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const continents = Array.from(new Set(data.map(dp => dp.countries.map(c => c.continent)).reduce((a, c) => a.concat(c), [])));
     continent.domain(continents);
+
+    // add labels to legend
+    continents.forEach((c, i) => {
+        const legendRow = legend.append('g')
+            .attr('transform', `translate(0, ${i * 20})`);
+
+        legendRow.append('rect')
+            .attr('width', 10)
+            .attr('height', 10)
+            .attr('fill', continent(c));
+
+        legendRow.append('text')
+            .attr('x', -10)
+            .attr('y', 10)
+            .attr('text-anchor', 'end')
+            .style('text-transform', 'capitalize')
+            .text(c);
+    });
 
     let i = 0;
     const interval = d3.interval(() => {
