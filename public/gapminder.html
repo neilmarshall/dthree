@@ -11,12 +11,15 @@
 
 <body>
   <div class="container-fluid">
-      <div class="row">
+      <div class="row my-1">
         <div class="col-md-6">
           <button id="play-button" class="btn btn-primary">Play</button>
           <button id="reset-button" class="btn btn-primary">Reset</button>
         </div>
-        <div class="col-md-6">
+      </div>
+      <div class="row">
+        <div class="col-md-3 form-inline">
+          <label class="mr-3" for="continent-select">Continent</label>
           <select id="continent-select" class="form-control">
             <option selected value="all">All</option>
             <option value="europe">Europe</option>
@@ -24,6 +27,12 @@
             <option value="americas">Americas</option>
             <option value="africa">Africa</option>
           </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <label class="mr-3" for="year-slider">Year</label>
+          <input id="year-slider" />
         </div>
       </div>
       <div class="row">

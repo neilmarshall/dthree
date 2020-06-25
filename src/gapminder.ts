@@ -1,5 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap-slider/dist/css/bootstrap-slider.min.css';
 import * as d3 from 'd3';
+const Slider = require('bootstrap-slider');
 
 type Country = { continent: string, country: string, income: number | null, life_exp: number | null, population: number};
 type DataPoint = { countries: Country[], year: number };
@@ -86,8 +88,12 @@ function update(data: DataPoint) {
 
 class VisualisationRunner {
     private currentYear: number;
-    private interval: any;
     private filteredData: DataPoint[];
+    private interval: any;
+    private minYear: number;
+    private maxYear: number;
+    private slider: any;
+
     private static readonly PLAY: string = "Play";
     private static readonly PAUSE: string = "Pause";
 
@@ -95,12 +101,19 @@ class VisualisationRunner {
         public data: DataPoint[],
         public playButton: HTMLElement,
         public resetButton: HTMLElement,
-        public filterButton: HTMLElement
+        public filterButton: HTMLElement,
+        public yearSlideSelector: string
     ) {
         this.currentYear = 0;
         this.interval = null;
         this.filteredData = this.data;
         (this.resetButton as HTMLButtonElement).disabled = true;
+        this.minYear = d3.min(data, dp => parseInt(dp.year.toString())) || 0;
+        this.maxYear = d3.max(data, dp => parseInt(dp.year.toString())) || 0;
+        this.slider = new Slider(yearSlideSelector, {
+            min: this.minYear,
+            max: this.maxYear
+        });
 
         this.playButton.addEventListener('click', () => {
             (this.resetButton as HTMLButtonElement).disabled = false;
@@ -118,7 +131,7 @@ class VisualisationRunner {
             }
         });
 
-        resetButton.addEventListener('click', () => {
+        this.resetButton.addEventListener('click', () => {
             if (this.interval) {
                 this.Reset();
                 switch (this.playButton.innerHTML) {
@@ -134,7 +147,7 @@ class VisualisationRunner {
             }
         });
 
-        filterButton.addEventListener('change', (e) => {
+        this.filterButton.addEventListener('change', (e) => {
             const continent = (e.target as HTMLButtonElement).value;
             if (continent === "all") {
                 this.filteredData = this.data;
@@ -143,6 +156,16 @@ class VisualisationRunner {
                     return {year: dp.year, countries: dp.countries.filter(d => d.continent === continent)}
                 });
             }
+            if (this.playButton.innerHTML === VisualisationRunner.PLAY) {
+                update(this.filteredData[this.currentYear]);
+            }
+        });
+
+        this.slider.on('slideStop', (selectedYear: number) => {
+            this.currentYear = selectedYear - this.minYear;
+            if (this.playButton.innerHTML === VisualisationRunner.PLAY) {
+                update(this.filteredData[this.currentYear]);
+            }
         });
     }
 
@@ -150,6 +173,7 @@ class VisualisationRunner {
         this.interval = d3.interval(() => {
             update(this.filteredData[this.currentYear]);
             this.currentYear = (this.currentYear + 1) % this.filteredData.length;
+            this.slider.setValue(this.currentYear + this.minYear);
         }, duration);
     }
 
@@ -215,6 +239,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         data,
         document.getElementById('play-button')!,
         document.getElementById('reset-button')!,
-        document.getElementById('continent-select')!
+        document.getElementById('continent-select')!,
+        '#year-slider'
     );
 });
