@@ -84,6 +84,86 @@ function update(data: DataPoint) {
             .attr('r', (c: Country) => r(c.population || 0));
 }
 
+class VisualisationRunner {
+    private currentYear: number;
+    private interval: any;
+    private filteredData: DataPoint[];
+    private static readonly PLAY: string = "Play";
+    private static readonly PAUSE: string = "Pause";
+
+    constructor(
+        public data: DataPoint[],
+        public playButton: HTMLElement,
+        public resetButton: HTMLElement,
+        public filterButton: HTMLElement
+    ) {
+        this.currentYear = 0;
+        this.interval = null;
+        this.filteredData = this.data;
+        (this.resetButton as HTMLButtonElement).disabled = true;
+
+        this.playButton.addEventListener('click', () => {
+            (this.resetButton as HTMLButtonElement).disabled = false;
+            switch (this.playButton.innerHTML) {
+                case VisualisationRunner.PLAY:
+                    this.playButton.innerHTML = VisualisationRunner.PAUSE;
+                    this.Play();
+                    break;
+                case VisualisationRunner.PAUSE:
+                    this.playButton.innerHTML = VisualisationRunner.PLAY;
+                    this.Pause();
+                    break;
+                default:
+                    throw "something went wrong";
+            }
+        });
+
+        resetButton.addEventListener('click', () => {
+            if (this.interval) {
+                this.Reset();
+                switch (this.playButton.innerHTML) {
+                    case VisualisationRunner.PLAY:
+                        this.playButton.innerHTML = VisualisationRunner.PAUSE;
+                        this.Play();
+                        break;
+                    case VisualisationRunner.PAUSE:
+                        break;
+                    default:
+                        throw "something went wrong";
+                }
+            }
+        });
+
+        filterButton.addEventListener('change', (e) => {
+            const continent = (e.target as HTMLButtonElement).value;
+            if (continent === "all") {
+                this.filteredData = this.data;
+            } else {
+                this.filteredData = this.data.map(dp => {
+                    return {year: dp.year, countries: dp.countries.filter(d => d.continent === continent)}
+                });
+            }
+        });
+    }
+
+    private Play() {
+        this.interval = d3.interval(() => {
+            update(this.filteredData[this.currentYear]);
+            this.currentYear = (this.currentYear + 1) % this.filteredData.length;
+        }, duration);
+    }
+
+    private Pause() {
+        this.interval.stop();
+    }
+
+    private Reset() {
+        (this.filterButton as HTMLButtonElement).value = 'all';
+        this.filteredData = this.data;
+        this.currentYear = 0;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     // load data
     const data: DataPoint[] = await d3.json('data/gapminder.json');
@@ -121,7 +201,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         legendRow.append('rect')
             .attr('width', 10)
             .attr('height', 10)
-            .attr('fill', continent(c));
+            .attr('fill', continent(c) as string);
 
         legendRow.append('text')
             .attr('x', -10)
@@ -131,9 +211,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             .text(c);
     });
 
-    let i = 0;
-    const interval = d3.interval(() => {
-        update(data[i]);
-        i = (i + 1) % data.length;
-    }, duration);
+    const runner = new VisualisationRunner(
+        data,
+        document.getElementById('play-button')!,
+        document.getElementById('reset-button')!,
+        document.getElementById('continent-select')!
+    );
 });
