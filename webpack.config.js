@@ -10,6 +10,7 @@ module.exports = {
         example5: './example5.js',
         example6: './example6.js',
         gapminder: './gapminder.js',
+        line_chart: './line_chart.js',
         scales: './scales.js'
     },
     mode: 'development',
