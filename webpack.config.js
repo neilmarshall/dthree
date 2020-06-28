@@ -11,6 +11,7 @@ module.exports = {
         example6: './example6.js',
         gapminder: './gapminder.js',
         line_chart: './line_chart.js',
+        area_chart: './area_chart.js',
         scales: './scales.js'
     },
     mode: 'development',
