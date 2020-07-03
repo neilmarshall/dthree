@@ -13,6 +13,7 @@ module.exports = {
         line_chart: './line_chart.js',
         area_chart: './area_chart.js',
         stacked_area_chart: './stacked_area_chart.js',
+        dashboard: './dashboard.js',
         scales: './scales.js'
     },
     mode: 'development',
